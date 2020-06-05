@@ -1,0 +1,182 @@
+Exporter version: 6.3.1, Blender version: 2.82 (sub 7)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used :
+		Inline textures     :  false
+		Material Type       :  PBR
+		Positions Precision :  4
+		Normals Precision   :  3
+		UVs Precision       :  3
+		Vert Color Precision:  3
+		Mat Weight Precision:  2
+		Keep Z-up r-handed  :  no
+		Texture directory   :  D:\Projects\istoryahi.me\projects\peerclient-gl\base-01\media\models\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  Ship004
+		processing begun of material:  Material.006
+		num positions      :  1662
+		num normals        :  1662
+		num tangents       :  0
+		num uvs            :  3324
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4536
+	processing begun of mesh:  LeftEngine
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightEngine
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  LeftThrusterEngine
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightThrusterEngine
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  LeftReverseThrustEngine
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightReverseThrustEngine
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontRightwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontLeftwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontDownwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontUpwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  LeftDownwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  LeftUpwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightDownwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightUpwardThruster
+		processing begun of material:  Material.006
+		registered as also a user of material:  Material.006
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+========= Writing of JSON file started =========
+	writing mesh:  Ship004
+	writing mesh:  LeftEngine
+	writing mesh:  RightEngine
+	writing mesh:  LeftThrusterEngine
+	writing mesh:  RightThrusterEngine
+	writing mesh:  LeftReverseThrustEngine
+	writing mesh:  RightReverseThrustEngine
+	writing mesh:  FrontRightwardThruster
+	writing mesh:  FrontLeftwardThruster
+	writing mesh:  FrontDownwardThruster
+	writing mesh:  FrontUpwardThruster
+	writing mesh:  LeftDownwardThruster
+	writing mesh:  LeftUpwardThruster
+	writing mesh:  RightDownwardThruster
+	writing mesh:  RightUpwardThruster
+========= Writing of JSON file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.1968 secs

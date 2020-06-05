@@ -1,0 +1,117 @@
+Exporter version: 6.3.1, Blender version: 2.82 (sub 7)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used :
+		Inline textures     :  false
+		Material Type       :  PBR
+		Positions Precision :  4
+		Normals Precision   :  3
+		UVs Precision       :  3
+		Vert Color Precision:  3
+		Mat Weight Precision:  2
+		Keep Z-up r-handed  :  no
+		Texture directory   :  D:\Projects\istoryahi.me\projects\peerclient-gl\base-01\assets\models\
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  Ship004
+		processing begun of material:  Material.006
+		num positions      :  1662
+		num normals        :  1662
+		num tangents       :  0
+		num uvs            :  3324
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4536
+	processing begun of mesh:  LeftEngine
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightEngine
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  LeftThrusterEngine
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightThrusterEngine
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  LeftReverseThrustEngine
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  RightReverseThrustEngine
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontRightwardThruster
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontLeftwardThruster
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontDownwardThruster
+		WARNING: No materials have been assigned: 
+		num positions      :  186
+		num normals        :  186
+		num tangents       :  0
+		num uvs            :  372
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  186
+	processing begun of mesh:  FrontUpwardThruster
+========= An error was encountered =========
+  File "C:\Users\Gil Michael\AppData\Roaming\Blender Foundation\Blender\2.82\scripts\addons\babylon_js\json_exporter.py", line 112, in execute
+    mesh = Mesh(object, scene, self)
+  File "C:\Users\Gil Michael\AppData\Roaming\Blender Foundation\Blender\2.82\scripts\addons\babylon_js\mesh.py", line 146, in __init__
+    recipe = BakingRecipe(bpyMesh, exporter)
+  File "C:\Users\Gil Michael\AppData\Roaming\Blender Foundation\Blender\2.82\scripts\addons\babylon_js\materials\baking_recipe.py", line 42, in __init__
+    bjsMaterial = BJSMaterial(bpyMaterial, exporter)
+  File "C:\Users\Gil Michael\AppData\Roaming\Blender Foundation\Blender\2.82\scripts\addons\babylon_js\materials\material.py", line 47, in __init__
+    self.checkReadyOnlyOnce = mat.checkReadyOnlyOnce
+ERROR:  'NoneType' object has no attribute 'checkReadyOnlyOnce'
+========= end of processing =========
+elapsed time:  0 min, 0.1143 secs
