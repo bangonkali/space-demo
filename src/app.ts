@@ -18,7 +18,6 @@ import { IInputEvent } from './Models/Events/IInputEvent';
 import { IWorkerMessage } from './Models/Events/IWorkMessage';
 import { DocumentEventType } from './Models/Events/DocumentEventType';
 import { StarSystem } from './Models/StarSystem/StarSystem';
-import * as nakamajs from '@heroiclabs/nakama-js';
 import { IResizeEvent } from './Models/Events/IResizeEvent';
 
 export class App {
@@ -41,9 +40,6 @@ export class App {
 
     this.context.scene.clearColor = Color4.FromColor3(Color3.BlackReadOnly);
     this.context.scene.actionManager = new ActionManager(this.context.scene);
-
-    const client = new nakamajs.Client('defaultkey', '127.0.0.1', '7350');
-    client.useSSL = true;
   }
 
   private async loadModel(path: string): Promise<AbstractMesh[]> {
