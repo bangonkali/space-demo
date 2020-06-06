@@ -28,10 +28,10 @@ export class Game {
   public arcRotateCamera: ArcRotateCamera;
 
   private arcRotateCameraVelocity: Vector2 = Vector2.Zero();
-  private lastMouseReleased: number = 0;
-  private lastMouseHeld: number = 0;
-  private animatingCameraOnClick: boolean = false;
-  private animatingCameraOnRelease: boolean = false;
+  private lastMouseReleased = 0;
+  private lastMouseHeld = 0;
+  private animatingCameraOnClick = false;
+  private animatingCameraOnRelease = false;
 
   public actor: MoveableMesh;
   public inputMap: KeyValuePair<boolean> = {};
