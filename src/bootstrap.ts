@@ -61,6 +61,14 @@ function init() {
       // console.log(mousePosition);
     });
 
+    canvas.addEventListener('mouseleave', (ev: MouseEvent) => {
+      const data: IInputEvent = {
+        type: DocumentEventType.Input,
+        mouseClicked: false,
+      };
+      worker.postMessage(data);
+    });
+
     canvas.addEventListener('mouseup', (ev: MouseEvent) => {
       const canvasRect = canvas.getBoundingClientRect();
       const position = DomUtils.getMousePosition(ev, canvasRect);
