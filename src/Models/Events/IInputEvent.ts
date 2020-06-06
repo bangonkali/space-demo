@@ -8,4 +8,5 @@ export type IInputEvent = {
   key?: string;
   keyState?: KeyState;
   mousePosition?: Vector2;
+  mouseClicked?: boolean;
 };

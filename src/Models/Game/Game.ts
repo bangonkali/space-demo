@@ -1,4 +1,4 @@
-import { GameMode } from './GameMode';
+import { GameMode, GameModeStateMachine } from './GameMode';
 import {
   UniversalCamera,
   Vector2,
@@ -6,27 +6,34 @@ import {
   Scalar,
   Axis,
   Space,
-  ExecuteCodeAction,
-  ActionManager,
-  ActionEvent,
+  ArcRotateCamera,
 } from 'babylonjs';
 import { MoveableMesh } from '../Ships/MoveableMesh';
 import { IContext } from '../IContext';
 // import { CenterHud } from '../Hud/CenterHud';
 import { Debug } from '../Debug/Debug';
-import { DomUtils } from '../../Utils/DomUtils';
 import { KeyValuePair } from '../KeyValuePair';
 import { IInputEvent } from '../Events/IInputEvent';
 import { KeyState } from '../Events/KeyState';
+import { VectorUtils } from '../../Utils/VectorUtils';
+import { ScalarUtils } from '../../Utils/ScalarUtils';
 
 export class Game {
   public context: IContext;
+  public fsm: GameModeStateMachine = new GameModeStateMachine();
+  public m: GameMode = GameMode.ThirdPersonArcRotate;
 
   // public hud: CenterHud;
   public universalCamera: UniversalCamera;
+  public arcRotateCamera: ArcRotateCamera;
+
+  private arcRotateCameraVelocity: Vector2 = Vector2.Zero();
+  private lastMouseReleased: number = 0;
+  private lastMouseHeld: number = 0;
+  private animatingCameraOnClick: boolean = false;
+  private animatingCameraOnRelease: boolean = false;
 
   public actor: MoveableMesh;
-  public mode: GameMode = GameMode.CockpitTargetting;
   public inputMap: KeyValuePair<boolean> = {};
   public mousePosition: Vector2 = Vector2.Zero();
   public debug: Debug;
@@ -43,17 +50,27 @@ export class Game {
       this.context.scene
     );
     this.universalCamera.parent = actor.mesh;
+
+    this.arcRotateCamera = new ArcRotateCamera(
+      'ArcRotateCamera',
+      Scalar.NormalizeRadians(-90 * ScalarUtils.RadUnit),
+      Scalar.NormalizeRadians(70 * ScalarUtils.RadUnit),
+      20,
+      actor.mesh.position,
+      this.context.scene
+    );
+    this.arcRotateCamera.allowUpsideDown = true;
+    this.context.scene.activeCamera = this.arcRotateCamera;
+
     // this.camera.attachControl(this.context.canvas, true);
     // this.hud = new CenterHud();
   }
 
   public init(): void {
-    console.log(`Initializing Before Render Observable`);
     this.context.scene.onBeforeRenderObservable.add(() => {
       this.udpate();
     });
 
-    console.log(`Initializing Render Loop`);
     this.context.engine.runRenderLoop(() => {
       this.context.scene.render();
     });
@@ -66,12 +83,29 @@ export class Game {
    * ```
    */
   public resize(): void {
-    console.log(`resize() called`);
     this.context.engine.resize();
   }
 
   public inputEvent(event: IInputEvent): void {
-    if (event.mousePosition) this.mousePosition = event.mousePosition;
+    if (event.mousePosition) {
+      // conver event.mousePosition to center 0,0
+      this.mousePosition = new Vector2(
+        event.mousePosition.x - this.context.canvas.width / 2,
+        event.mousePosition.y - this.context.canvas.height / 2
+      );
+    }
+
+    // event.mouseClicked could be undefined, in which case, do nothing
+    if (event.mouseClicked === true) {
+      this.inputMap['M1'] = true;
+      if (!this.animatingCameraOnClick) {
+        this.lastMouseHeld = new Date().getTime();
+        this.animatingCameraOnClick = true;
+      }
+    } else if (event.mouseClicked === false) {
+      this.inputMap['M1'] = false;
+      this.lastMouseReleased = new Date().getTime();
+    }
 
     if (event.key)
       this.inputMap[event.key] = event.keyState === KeyState.KeyDown;
@@ -81,8 +115,12 @@ export class Game {
     if (this.inputMap === undefined) return;
     if (this.mousePosition === undefined) return;
 
+    const xBias = this.mousePosition.x / (this.context.canvas.width / 2);
+    const yBias = this.mousePosition.y / (this.context.canvas.height / 2);
+
     this.delta = this.context.scene.getEngine().getDeltaTime();
     const dT = this.delta / 1000;
+    const cT = new Date().getTime();
 
     /* #region  Translations */
     if (this.inputMap['x']) {
@@ -90,6 +128,23 @@ export class Game {
       this.actor.acceleration = Vector3.Zero();
       this.actor.velocity = Vector3.Zero();
       this.actor.angularVelocity = Vector3.Zero();
+    }
+
+    /* #region  Change camera mode */
+    if (this.inputMap['y']) {
+      this.inputMap['y'] = false;
+
+      this.m = this.fsm.cycle(this.m);
+      switch (this.m) {
+        case GameMode.ThirdPersonArcRotate:
+          this.context.scene.activeCamera = this.arcRotateCamera;
+          break;
+        case GameMode.ThirdPersonTargetting:
+          this.context.scene.activeCamera = this.universalCamera;
+          break;
+        default:
+          this.context.scene.activeCamera = this.universalCamera;
+      }
     }
 
     if (this.inputMap['r']) {
@@ -312,11 +367,6 @@ export class Game {
       Space.LOCAL
     );
 
-    if (this.inputMap['o']) {
-      this.debug.toggle(this.delta);
-      this.inputMap['o'] = false;
-    }
-
     // apply new positions
     const localPosition = this.actor.mesh
       .getPositionExpressedInLocalSpace()
@@ -328,6 +378,90 @@ export class Game {
         )
       );
     this.actor.mesh.setPositionWithLocalVector(localPosition);
+
+    /**
+     * Make sure to lock the camera first before making changes to alpha and beta angles.
+     */
+    if (this.m === GameMode.ThirdPersonArcRotate) {
+      this.arcRotateCamera.target = this.actor.mesh.position;
+      this.arcRotateCamera.radius = 20;
+    }
+
+    /**
+     * Apply changes to alpha and beta angles after the camera has been target locked.
+     */
+    if (
+      this.mousePosition &&
+      this.m === GameMode.ThirdPersonArcRotate &&
+      this.inputMap['M1'] === true
+    ) {
+      const riseTime = 1000;
+      const max = 90 * 100 * ScalarUtils.RadUnit;
+      const stepTime = Scalar.Clamp(cT - this.lastMouseHeld, 0, riseTime);
+      const stepValue = Scalar.SmoothStep(0, max, stepTime);
+
+      this.arcRotateCameraVelocity.x = xBias * stepValue * dT;
+
+      this.arcRotateCameraVelocity.y = yBias * stepValue * dT;
+    } else if (
+      this.mousePosition &&
+      this.m === GameMode.ThirdPersonArcRotate &&
+      this.inputMap['M1'] === false
+    ) {
+      this.animatingCameraOnClick = false;
+      this.animatingCameraOnRelease = true;
+    }
+
+    if (this.animatingCameraOnRelease) {
+      const riseTime = 1000;
+      if (cT - this.lastMouseReleased > riseTime) {
+        this.animatingCameraOnRelease = false;
+      } else {
+        const max = 45 * 100 * ScalarUtils.RadUnit;
+        const stepTime = Scalar.Clamp(cT - this.lastMouseReleased, 0, riseTime);
+        const stepValue = Scalar.SmoothStep(max, 0, stepTime);
+        this.arcRotateCameraVelocity.x = xBias * stepValue * dT;
+        this.arcRotateCameraVelocity.y = yBias * stepValue * dT;
+      }
+    }
+
+    this.arcRotateCamera.alpha =
+      this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT;
+
+    this.arcRotateCamera.beta =
+      this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT;
+
+    // this.arcRotateCamera.alpha = ScalarUtils.ClipRadians(
+    //   this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT
+    // );
+
+    // this.arcRotateCamera.beta = ScalarUtils.ClipRadians(
+    //   this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT
+    // );
+
+    if (this.inputMap['o']) {
+      // this.debug.toggle(this.delta);
+      this.inputMap['o'] = false;
+      let a = `Camera: ${(this.arcRotateCamera.alpha * 180) / Math.PI}; ${
+        (this.arcRotateCamera.beta * 180) / Math.PI
+      }; ${this.arcRotateCamera.radius}\n`;
+      a += `CameraVelo: ${this.arcRotateCameraVelocity.toString()}\n`;
+      a += `Mouse position: ${this.mousePosition.toString()}\n`;
+      a += `Velocity: ${VectorUtils.format(this.actor.velocity)}\n`;
+      a += `Acceleration: ${VectorUtils.format(this.actor.acceleration)}\n`;
+      a += `Vessel Abs Pos: ${VectorUtils.format(
+        this.actor.mesh.getAbsolutePosition()
+      )}\n`;
+      a += `Vessel Loc Pos: ${VectorUtils.format(
+        this.actor.mesh.getPositionExpressedInLocalSpace()
+      )}\n`;
+      a += `\n`;
+      a += `Keys: ${VectorUtils.format(
+        this.actor.mesh.getPositionExpressedInLocalSpace()
+      )}\n`;
+      console.log(a);
+    }
+
     // this.camera.rotation = this.actor.mesh.rotation;
     /* #endregion */
 

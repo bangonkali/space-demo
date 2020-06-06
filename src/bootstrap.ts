@@ -61,6 +61,30 @@ function init() {
       // console.log(mousePosition);
     });
 
+    canvas.addEventListener('mouseup', (ev: MouseEvent) => {
+      const canvasRect = canvas.getBoundingClientRect();
+      const position = DomUtils.getMousePosition(ev, canvasRect);
+      const mousePosition = new Vector2(position.x, position.y);
+      const data: IInputEvent = {
+        type: DocumentEventType.Input,
+        mousePosition: mousePosition,
+        mouseClicked: false,
+      };
+      worker.postMessage(data);
+    });
+
+    canvas.addEventListener('mousedown', (ev: MouseEvent) => {
+      const canvasRect = canvas.getBoundingClientRect();
+      const position = DomUtils.getMousePosition(ev, canvasRect);
+      const mousePosition = new Vector2(position.x, position.y);
+      const data: IInputEvent = {
+        type: DocumentEventType.Input,
+        mousePosition: mousePosition,
+        mouseClicked: true,
+      };
+      worker.postMessage(data);
+    });
+
     window.addEventListener('resize', () => {
       const resizeEvent: IResizeEvent = {
         type: DocumentEventType.Resize,

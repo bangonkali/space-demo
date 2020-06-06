@@ -1,6 +1,7 @@
 import { IMoveable } from '../IMoveableMesh';
 import { Vector3, AbstractMesh, Scene } from 'babylonjs';
 import { EngineMesh } from './EngineMesh';
+import { ScalarUtils } from '../../Utils/ScalarUtils';
 
 /**
  * Some notes.
@@ -28,16 +29,16 @@ export class MoveableMesh implements IMoveable {
 
   /* Angle in radians = Angle in degrees x PI / 180. */
   public angularJerk: Vector3 = new Vector3(
-    ((45 / 4) * Math.PI) / 180,
-    ((45 / 4) * Math.PI) / 180,
-    ((45 / 4) * Math.PI) / 180
+    (45 / 4) * ScalarUtils.RadUnit,
+    (45 / 4) * ScalarUtils.RadUnit,
+    (45 / 4) * ScalarUtils.RadUnit
   );
   public angularVelocity: Vector3 = Vector3.Zero();
   public angularAcceleration: Vector3 = Vector3.Zero();
   public maxAngularAcceleration: Vector3 = new Vector3(
-    ((45 / 2) * Math.PI) / 180,
-    ((45 / 2) * Math.PI) / 180,
-    ((45 / 2) * Math.PI) / 180
+    (45 / 2) * ScalarUtils.RadUnit,
+    (45 / 2) * ScalarUtils.RadUnit,
+    (45 / 2) * ScalarUtils.RadUnit
   );
 
   public leftEngine: EngineMesh;
