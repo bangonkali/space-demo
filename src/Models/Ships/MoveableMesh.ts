@@ -63,9 +63,9 @@ export class MoveableMesh implements IMoveable {
     this.mesh = mesh;
     this.basePath = basePath;
 
-    this.mesh
-      .getChildren()
-      .forEach((e) => console.log(`name: ${e.name} : ${e.uniqueId}`));
+    // this.mesh
+    //   .getChildren()
+    //   .forEach((e) => console.log(`name: ${e.name} : ${e.uniqueId}`));
 
     // initialize all particle systems
     this.leftEngine = new EngineMesh('LeftEngine', this, scene);

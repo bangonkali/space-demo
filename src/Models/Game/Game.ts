@@ -28,10 +28,7 @@ export class Game {
   public arcRotateCamera: ArcRotateCamera;
 
   private arcRotateCameraVelocity: Vector2 = Vector2.Zero();
-  private lastMouseReleased = 0;
-  private lastMouseHeld = 0;
-  private animatingCameraOnClick = false;
-  private animatingCameraOnRelease = false;
+  private lastMouseHeld: undefined | number;
 
   public actor: MoveableMesh;
   public inputMap: KeyValuePair<boolean> = {};
@@ -98,13 +95,11 @@ export class Game {
     // event.mouseClicked could be undefined, in which case, do nothing
     if (event.mouseClicked === true) {
       this.inputMap['M1'] = true;
-      if (!this.animatingCameraOnClick) {
+      if (!this.lastMouseHeld) {
         this.lastMouseHeld = new Date().getTime();
-        this.animatingCameraOnClick = true;
       }
     } else if (event.mouseClicked === false) {
       this.inputMap['M1'] = false;
-      this.lastMouseReleased = new Date().getTime();
     }
 
     if (event.key)
@@ -393,7 +388,8 @@ export class Game {
     if (
       this.mousePosition &&
       this.m === GameMode.ThirdPersonArcRotate &&
-      this.inputMap['M1'] === true
+      this.inputMap['M1'] === true &&
+      this.lastMouseHeld
     ) {
       const riseTime = 1000;
       const max = 90 * 100 * ScalarUtils.RadUnit;
@@ -401,35 +397,33 @@ export class Game {
       const stepValue = Scalar.SmoothStep(0, max, stepTime);
 
       this.arcRotateCameraVelocity.x = xBias * stepValue * dT;
-
       this.arcRotateCameraVelocity.y = yBias * stepValue * dT;
     } else if (
       this.mousePosition &&
       this.m === GameMode.ThirdPersonArcRotate &&
-      this.inputMap['M1'] === false
+      this.inputMap['M1'] === false &&
+      this.lastMouseHeld
     ) {
-      this.animatingCameraOnClick = false;
-      this.animatingCameraOnRelease = true;
+      this.lastMouseHeld = undefined;
     }
 
-    if (this.animatingCameraOnRelease) {
-      const riseTime = 1000;
-      if (cT - this.lastMouseReleased > riseTime) {
-        this.animatingCameraOnRelease = false;
-      } else {
-        const max = 45 * 100 * ScalarUtils.RadUnit;
-        const stepTime = Scalar.Clamp(cT - this.lastMouseReleased, 0, riseTime);
-        const stepValue = Scalar.SmoothStep(max, 0, stepTime);
-        this.arcRotateCameraVelocity.x = xBias * stepValue * dT;
-        this.arcRotateCameraVelocity.y = yBias * stepValue * dT;
-      }
+    if (this.lastMouseHeld === undefined) {
+      this.arcRotateCameraVelocity = ScalarUtils.DeteriorateVector(
+        this.arcRotateCameraVelocity,
+        5 * ScalarUtils.RadUnit,
+        0.5,
+        dT
+      );
     }
 
     this.arcRotateCamera.alpha =
       this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT;
 
-    this.arcRotateCamera.beta =
-      this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT;
+    this.arcRotateCamera.beta = Scalar.Clamp(
+      this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT,
+      0.1,
+      Math.PI - 0.1
+    );
 
     // this.arcRotateCamera.alpha = ScalarUtils.ClipRadians(
     //   this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT
