@@ -28,11 +28,15 @@ export class Game {
   public arcRotateCamera: ArcRotateCamera;
 
   private arcRotateCameraVelocity: Vector2 = Vector2.Zero();
-  private lastMouseHeld: undefined | number;
+  private lastMouseHeld?: number;
 
   public actor: MoveableMesh;
   public inputMap: KeyValuePair<boolean> = {};
-  public mousePosition: Vector2 = Vector2.Zero();
+  public mousePosition?: Vector2;
+  public lastCenterPosition?: Vector2;
+  public positionFromLocalOrigin?: Vector2;
+  public mouseBias?: Vector2;
+
   public debug: Debug;
 
   public delta = 0;
@@ -74,6 +78,18 @@ export class Game {
   }
 
   /**
+   * Update the mouse bias based on container size.
+   */
+  private udpateMouseBias() {
+    if (this.positionFromLocalOrigin) {
+      this.mouseBias = new Vector2(
+        this.positionFromLocalOrigin.x / this.context.canvas.width,
+        this.positionFromLocalOrigin.y / this.context.canvas.height
+      );
+    }
+  }
+
+  /**
    * This is typically bound to the containers resize function.
    * ```ts
    * window.addEventListener("resize", game.resize);
@@ -81,37 +97,57 @@ export class Game {
    */
   public resize(): void {
     this.context.engine.resize();
+    this.udpateMouseBias();
   }
 
   public inputEvent(event: IInputEvent): void {
     if (event.mousePosition) {
-      // conver event.mousePosition to center 0,0
+      // convert event.mousePosition to center 0,0
       this.mousePosition = new Vector2(
         event.mousePosition.x - this.context.canvas.width / 2,
         event.mousePosition.y - this.context.canvas.height / 2
       );
+
+      // translate the mouse position.
+      if (this.lastCenterPosition) {
+        this.positionFromLocalOrigin = this.mousePosition.subtract(
+          this.lastCenterPosition
+        );
+
+        this.udpateMouseBias();
+      }
     }
 
     // event.mouseClicked could be undefined, in which case, do nothing
     if (event.mouseClicked === true) {
       this.inputMap['M1'] = true;
       if (!this.lastMouseHeld) {
+        // Set the time when the last time the mouse was held.
         this.lastMouseHeld = new Date().getTime();
+
+        // Set the lastCenterPosition if the mouse is clicked.
+        if (this.mousePosition && this.lastCenterPosition === undefined) {
+          this.lastCenterPosition = this.mousePosition;
+        }
       }
     } else if (event.mouseClicked === false) {
+      // ensure to undefine the mouse tracking when mouse is released.
       this.inputMap['M1'] = false;
+      this.lastMouseHeld = undefined;
+      this.mousePosition = undefined;
+      this.lastCenterPosition = undefined;
+      this.positionFromLocalOrigin = undefined;
+      this.mouseBias = undefined;
     }
 
-    if (event.key)
+    if (event.key) {
+      // ensure key down events are propagated.
       this.inputMap[event.key] = event.keyState === KeyState.KeyDown;
+    }
   }
 
   public udpate(): void {
     if (this.inputMap === undefined) return;
-    if (this.mousePosition === undefined) return;
-
-    const xBias = this.mousePosition.x / (this.context.canvas.width / 2);
-    const yBias = this.mousePosition.y / (this.context.canvas.height / 2);
 
     this.delta = this.context.scene.getEngine().getDeltaTime();
     const dT = this.delta / 1000;
@@ -374,64 +410,44 @@ export class Game {
       );
     this.actor.mesh.setPositionWithLocalVector(localPosition);
 
-    /**
-     * Make sure to lock the camera first before making changes to alpha and beta angles.
-     */
     if (this.m === GameMode.ThirdPersonArcRotate) {
+      // Make sure to lock the camera first before making changes to alpha and beta angles
       this.arcRotateCamera.target = this.actor.mesh.position;
       this.arcRotateCamera.radius = 20;
-    }
 
-    /**
-     * Apply changes to alpha and beta angles after the camera has been target locked.
-     */
-    if (
-      this.mousePosition &&
-      this.m === GameMode.ThirdPersonArcRotate &&
-      this.inputMap['M1'] === true &&
-      this.lastMouseHeld
-    ) {
-      const riseTime = 1000;
-      const max = 90 * 100 * ScalarUtils.RadUnit;
-      const stepTime = Scalar.Clamp(cT - this.lastMouseHeld, 0, riseTime);
-      const stepValue = Scalar.SmoothStep(0, max, stepTime);
+      // Apply changes to alpha and beta angles after the camera has been target locked.
+      if (
+        this.mouseBias &&
+        this.inputMap['M1'] === true &&
+        this.lastMouseHeld !== undefined
+      ) {
+        const riseTime = 1000;
+        const max = 90 * 100 * ScalarUtils.RadUnit;
+        const stepTime = Scalar.Clamp(cT - this.lastMouseHeld, 0, riseTime);
+        const stepValue = Scalar.SmoothStep(0, max, stepTime);
 
-      this.arcRotateCameraVelocity.x = xBias * stepValue * dT;
-      this.arcRotateCameraVelocity.y = yBias * stepValue * dT;
-    } else if (
-      this.mousePosition &&
-      this.m === GameMode.ThirdPersonArcRotate &&
-      this.inputMap['M1'] === false &&
-      this.lastMouseHeld
-    ) {
-      this.lastMouseHeld = undefined;
-    }
+        this.arcRotateCameraVelocity.x = this.mouseBias.x * stepValue * dT;
+        this.arcRotateCameraVelocity.y = this.mouseBias.y * stepValue * dT;
+      }
 
-    if (this.lastMouseHeld === undefined) {
-      this.arcRotateCameraVelocity = ScalarUtils.DeteriorateVector(
-        this.arcRotateCameraVelocity,
-        5 * ScalarUtils.RadUnit,
-        0.5,
-        dT
+      if (this.lastMouseHeld === undefined) {
+        this.arcRotateCameraVelocity = ScalarUtils.DeteriorateVector(
+          this.arcRotateCameraVelocity,
+          5 * ScalarUtils.RadUnit,
+          0.5,
+          dT
+        );
+      }
+
+      this.arcRotateCamera.alpha =
+        this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT;
+
+      this.arcRotateCamera.beta = Scalar.Clamp(
+        this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT,
+        0.1,
+        Math.PI - 0.1
       );
     }
-
-    this.arcRotateCamera.alpha =
-      this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT;
-
-    this.arcRotateCamera.beta = Scalar.Clamp(
-      this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT,
-      0.1,
-      Math.PI - 0.1
-    );
-
-    // this.arcRotateCamera.alpha = ScalarUtils.ClipRadians(
-    //   this.arcRotateCamera.alpha - this.arcRotateCameraVelocity.x * dT
-    // );
-
-    // this.arcRotateCamera.beta = ScalarUtils.ClipRadians(
-    //   this.arcRotateCamera.beta - this.arcRotateCameraVelocity.y * dT
-    // );
 
     if (this.inputMap['o']) {
       // this.debug.toggle(this.delta);
@@ -440,7 +456,7 @@ export class Game {
         (this.arcRotateCamera.beta * 180) / Math.PI
       }; ${this.arcRotateCamera.radius}\n`;
       a += `CameraVelo: ${this.arcRotateCameraVelocity.toString()}\n`;
-      a += `Mouse position: ${this.mousePosition.toString()}\n`;
+      a += `Mouse translated position: ${this.positionFromLocalOrigin?.toString()}\n`;
       a += `Velocity: ${VectorUtils.format(this.actor.velocity)}\n`;
       a += `Acceleration: ${VectorUtils.format(this.actor.acceleration)}\n`;
       a += `Vessel Abs Pos: ${VectorUtils.format(
@@ -461,7 +477,6 @@ export class Game {
 
     // this.hud.update(() => {
     //   let a = `Debug Information\n`;
-    //   a += `Mouse position: ${this.mousePosition.toString()}\n`;
     //   a += `Velocity: ${VectorUtils.format(this.actor.velocity)}\n`;
     //   a += `Acceleration: ${VectorUtils.format(this.actor.acceleration)}\n`;
     //   a += `Camera Target: ${VectorUtils.format(this.camera.getTarget())}\n`;
