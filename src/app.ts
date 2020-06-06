@@ -10,6 +10,8 @@ import {
   Color3,
   Color4,
   Quaternion,
+  SceneLoaderProgressEvent,
+  CubeTexture,
 } from 'babylonjs';
 import { MoveableMesh } from './Models/Ships/MoveableMesh';
 import { IContext } from './Models/IContext';
@@ -43,26 +45,73 @@ export class App {
   }
 
   private async loadModel(path: string): Promise<AbstractMesh[]> {
-    return new Promise((res) => {
-      if (!this.context) throw Error(`The context is null.`);
-
+    return new Promise((resolve, error) => {
+      if (!this.context) {
+        error(Error(`The context is null.`));
+        return;
+      }
+      const scene = this.context.scene;
+      const basePath = `${this.context.basePath}/assets/models/`;
+      const stuff = ['Ship004'];
+      console.log(`Downloading ${basePath}`);
       SceneLoader.ImportMesh(
-        ['Ship004'],
-        `${this.context.basePath}/assets/models/`,
+        stuff,
+        basePath,
         path,
-        this.context.scene,
-        (mesh) => {
-          res(mesh);
+        scene,
+        (c: AbstractMesh[]) => {
+          stuff.forEach((e) => console.log(`Loaded ${basePath}${e}`));
+          resolve(c);
+        },
+        (e: SceneLoaderProgressEvent) => {
+          console.log(`Loading progress ${e.loaded}\\${e.total}`);
+        },
+        (message, exception) => {
+          console.error(`Error ${message}`);
+          error(exception);
         }
+      );
+    });
+  }
+
+  private async loadSkybox(file: string): Promise<CubeTexture> {
+    return new Promise((resolve, error) => {
+      if (!this.context) throw Error(`The context is null.`);
+      const texturePath = `${this.context.basePath}/assets/skybox/${file}`;
+      const envTexture = new CubeTexture(
+        texturePath,
+        this.context.scene,
+        undefined,
+        true,
+        undefined,
+        () => {
+          console.info(`Loaded ${texturePath}`);
+          resolve(envTexture);
+        },
+        (message, exception) => {
+          console.error(`Error ${message} loading ${texturePath}`);
+          error(exception);
+        },
+        undefined,
+        false,
+        undefined,
+        true,
+        undefined,
+        undefined
       );
     });
   }
 
   private async createGameAsync(): Promise<void> {
     if (!this.context) throw Error(`The context is null.`);
+    const skyboxFile = `purple-nebula-complex-1k.dds`;
+    const texture = await this.loadSkybox(skyboxFile);
+    this.context.scene.createDefaultSkybox(texture, true, 10000);
 
-    const mesh = await this.loadModel('ship004.babylon');
+    const meshFile = `ship004.babylon`;
+    const mesh = await this.loadModel(meshFile);
     mesh[0].position = Vector3.Zero().addInPlaceFromFloats(0, 1, 0);
+    mesh[0].renderingGroupId = 1;
     const actor = new MoveableMesh(
       mesh[0],
       this.context.basePath,
