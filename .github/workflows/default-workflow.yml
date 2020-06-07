@@ -26,5 +26,6 @@ jobs:
     - name: Sanity Check
       run: |
         npm install
-        npm run lint --if-present
-        npm run build --if-present
+        npm run lint
+        npm run build
+        npm run build:prod

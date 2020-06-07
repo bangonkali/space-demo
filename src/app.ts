@@ -21,8 +21,10 @@ import { IWorkerMessage } from './Models/Events/IWorkMessage';
 import { DocumentEventType } from './Models/Events/DocumentEventType';
 import { StarSystem } from './Models/StarSystem/StarSystem';
 import { IResizeEvent } from './Models/Events/IResizeEvent';
+import _ from 'lodash';
+import { IPostable } from './Models/IPostable';
 
-export class App {
+export class App implements IPostable {
   public static AppInstance: App = new App();
   public static IsWorkerStarted = false;
 
@@ -145,7 +147,7 @@ export class App {
       });
   }
 
-  public resizeEvent(resize: IResizeEvent): void {
+  private resizeEvent(resize: IResizeEvent): void {
     if (this.context && this.context.canvas && resize.width && resize.height) {
       this.context.canvas.width = resize.width;
       this.context.canvas.height = resize.height;
@@ -156,9 +158,20 @@ export class App {
    * This is how the application receives inputs from mouse, keyboard, gamepad, or touch screen.
    * @param event The IInputEvent passed to the app layer.
    */
-  public inputEvent(event: IInputEvent): void {
+  private inputEvent(event: IInputEvent): void {
     if (!this.game) return;
     else this.game.inputEvent(event);
+  }
+
+  public postMessage(data: IWorkerMessage) {
+    switch (data.type) {
+      case DocumentEventType.Input:
+        this.inputEvent(data as IInputEvent);
+        break;
+      case DocumentEventType.Resize:
+        this.resizeEvent(data as IResizeEvent);
+        break;
+    }
   }
 
   /**
@@ -176,11 +189,8 @@ export class App {
             throw Error('This worker has already been started.');
           App.AppInstance.run(data.canvas as HTMLCanvasElement, data.basePath);
           break;
-        case DocumentEventType.Input:
-          App.AppInstance.inputEvent(data as IInputEvent);
-          break;
-        case DocumentEventType.Resize:
-          App.AppInstance.resizeEvent(data as IResizeEvent);
+        default:
+          App.AppInstance.postMessage(data);
           break;
       }
     });

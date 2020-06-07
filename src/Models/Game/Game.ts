@@ -17,6 +17,7 @@ import { IInputEvent } from '../Events/IInputEvent';
 import { KeyState } from '../Events/KeyState';
 import { VectorUtils } from '../../Utils/VectorUtils';
 import { ScalarUtils } from '../../Utils/ScalarUtils';
+import _ from 'lodash';
 
 export class Game {
   public context: IContext;
@@ -471,6 +472,36 @@ export class Game {
       )}\n`;
       console.log(a);
     }
+
+    // // try to get the 2d canvas.
+    // if (OffscreenCanvasRenderingContext2D && _.isNil(this.context.canvas2d)) {
+    //   const inernalCanvas = new OffscreenCanvas(
+    //     this.context.canvas.width,
+    //     this.context.canvas.height
+    //   );
+    //   const context2d = inernalCanvas.getContext('2d');
+    //   if (context2d) this.context.canvas2d = context2d;
+    // }
+
+    // if (this.context.canvas2d) {
+    //   this.context.canvas2d.font = '20px Georgia';
+    //   this.context.canvas2d.fillText('Hello World!', 10, 50);
+
+    //   this.context.canvas2d.font = '30px Verdana';
+    //   // Create gradient
+    //   const gradient = this.context.canvas2d.createLinearGradient(
+    //     0,
+    //     0,
+    //     this.context.canvas.width,
+    //     0
+    //   );
+    //   gradient.addColorStop(0, ' magenta');
+    //   gradient.addColorStop(0.5, 'blue');
+    //   gradient.addColorStop(1.0, 'red');
+    //   // Fill with gradient
+    //   this.context.canvas2d.fillStyle = gradient;
+    //   this.context.canvas2d.fillText('Big smile!', 10, 90);
+    // }
 
     // this.camera.rotation = this.actor.mesh.rotation;
     /* #endregion */

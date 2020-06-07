@@ -6,4 +6,5 @@ export type IContext = {
   engine: Engine;
   scene: Scene;
   basePath: string;
+  canvas2d?: OffscreenCanvasRenderingContext2D;
 };
