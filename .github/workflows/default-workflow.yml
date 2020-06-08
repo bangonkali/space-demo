@@ -53,3 +53,7 @@ jobs:
     - name: Sync prod
       run: |
         aws s3 sync ./dist/prod/ ${{ secrets.AWS_S3_PROD }}
+
+    - name: Sync dev
+      run: |
+        aws s3 sync ./dist/dev/ ${{ secrets.AWS_S3_DEV }}
