@@ -13,7 +13,7 @@ export class Bootstrap {
   private workerPath = DomUtils.cleanUrl(`${this.basePath}/worker.bundle.js`);
 
   private bindInputs(canvas: HTMLCanvasElement, client: IPostable) {
-    console.log(`Binding input channel to canvas`);
+    console.log(`Binding input channel to canvas ${this.basePath}`);
 
     window.addEventListener('keydown', (e) => {
       const data: IInputEvent = {
@@ -113,13 +113,13 @@ export class Bootstrap {
           this.bindInputs(canvas, worker);
         } else {
           console.warn(`Worker not found. Using main thread.`);
-          App.AppInstance.run(canvas, document.location.href);
+          App.AppInstance.run(canvas, this.basePath);
           this.bindInputs(canvas, App.AppInstance);
         }
       })
       .catch((err) => {
         console.warn(`Worker not found, using main thread. ${err.message}`);
-        App.AppInstance.run(canvas, document.location.href);
+        App.AppInstance.run(canvas, this.basePath);
         this.bindInputs(canvas, App.AppInstance);
       });
   }
