@@ -9,8 +9,8 @@ import { DomUtils } from './Utils/DomUtils';
 import { IPostable } from './Models/IPostable';
 
 export class Bootstrap {
-  private basePath = document.location.origin;
-  private workerPath = `${this.basePath}/dist/worker.bundle.js`;
+  private basePath = DomUtils.cleanUrl(document.location.origin);
+  private workerPath = DomUtils.cleanUrl(`${this.basePath}/worker.bundle.js`);
 
   private bindInputs(canvas: HTMLCanvasElement, client: IPostable) {
     console.log(`Binding input channel to canvas`);
@@ -107,7 +107,7 @@ export class Bootstrap {
           const message: IWorkerMessage = {
             type: DocumentEventType.Init,
             canvas: offScreenCanvas,
-            basePath: document.location.origin,
+            basePath: this.basePath,
           };
           worker.postMessage(message, [offScreenCanvas]);
           this.bindInputs(canvas, worker);

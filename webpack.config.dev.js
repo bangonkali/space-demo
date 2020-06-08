@@ -12,6 +12,7 @@ module.exports = merge(common, {
     path: outputPath,
     filename: '[name].bundle.js',
   },
+  devtool: 'source-map',
   entry: {
     bootstrap: path.resolve(__dirname, 'src/bootstrap.ts'),
   },

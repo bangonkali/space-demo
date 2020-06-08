@@ -5,6 +5,5 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   resolve: {
     extensions: ['.ts', '.js'],
-  },
-  devtool: 'source-map',
+  }
 };

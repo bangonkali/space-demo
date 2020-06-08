@@ -6,6 +6,7 @@ import {
   AbstractMesh,
   Scene,
 } from 'babylonjs';
+import { DomUtils } from './DomUtils';
 
 export class ParticleUtils {
   public static createAndAttachParticleSystem(
@@ -19,10 +20,9 @@ export class ParticleUtils {
       2000,
       scene
     );
-    particleSystem.particleTexture = new Texture(
-      `${basePath}/assets/textures/flare.png`,
-      scene
-    );
+    const path = `${basePath}/assets/textures/flare.png`;
+    const cleanPath = DomUtils.cleanUrl(path);
+    particleSystem.particleTexture = new Texture(cleanPath, scene);
 
     particleSystem.emitter = mesh; // the starting object, the emitter
     particleSystem.minEmitBox = new Vector3(-1, 0, 0); // Starting all from

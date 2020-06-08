@@ -23,6 +23,7 @@ import { StarSystem } from './Models/StarSystem/StarSystem';
 import { IResizeEvent } from './Models/Events/IResizeEvent';
 import _ from 'lodash';
 import { IPostable } from './Models/IPostable';
+import { DomUtils } from './Utils/DomUtils';
 
 export class App implements IPostable {
   public static AppInstance: App = new App();
@@ -46,23 +47,25 @@ export class App implements IPostable {
     this.context.scene.actionManager = new ActionManager(this.context.scene);
   }
 
-  private async loadModel(path: string): Promise<AbstractMesh[]> {
+  private async loadModel(
+    names: string[],
+    file: string
+  ): Promise<AbstractMesh[]> {
     return new Promise((resolve, error) => {
       if (!this.context) {
         error(Error(`The context is null.`));
         return;
       }
-      const scene = this.context.scene;
-      const basePath = `${this.context.basePath}/assets/models/`;
-      const stuff = ['Ship004'];
-      console.log(`Downloading ${basePath}`);
+      const basePath = `${this.context.basePath}/assets/models`;
+      const cleanPath = `${DomUtils.cleanUrl(basePath)}/`;
+      console.log(`Downloading ${cleanPath}`);
       SceneLoader.ImportMesh(
-        stuff,
-        basePath,
-        path,
-        scene,
+        names,
+        cleanPath,
+        file,
+        this.context.scene,
         (c: AbstractMesh[]) => {
-          stuff.forEach((e) => console.log(`Loaded ${basePath}${e}`));
+          names.forEach((e) => console.log(`Loaded ${cleanPath}${e}`));
           resolve(c);
         },
         (e: SceneLoaderProgressEvent) => {
@@ -79,7 +82,8 @@ export class App implements IPostable {
   private async loadSkybox(file: string): Promise<CubeTexture> {
     return new Promise((resolve, error) => {
       if (!this.context) throw Error(`The context is null.`);
-      const texturePath = `${this.context.basePath}/assets/skybox/${file}`;
+      const path = `${this.context.basePath}/assets/skybox/${file}`;
+      const texturePath = DomUtils.cleanUrl(path);
       const envTexture = new CubeTexture(
         texturePath,
         this.context.scene,
@@ -111,9 +115,11 @@ export class App implements IPostable {
     this.context.scene.createDefaultSkybox(texture, true, 10000);
 
     const meshFile = `ship004.babylon`;
-    const mesh = await this.loadModel(meshFile);
+    const stuff = ['Ship004'];
+    const mesh = await this.loadModel(stuff, meshFile);
     mesh[0].position = Vector3.Zero().addInPlaceFromFloats(0, 1, 0);
     mesh[0].renderingGroupId = 1;
+
     const actor = new MoveableMesh(
       mesh[0],
       this.context.basePath,

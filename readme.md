@@ -88,3 +88,9 @@ npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-materials@p
 - https://www.turbosquid.com/AssetManager/Index.cfm?stgAction=getFiles&subAction=Download&intID=1216479&intType=3
 - https://www.turbosquid.com/3d-model/free/low-poly/spacecraft?synonym=spaceship
 -
+
+# References
+
+## Icons
+
+- https://www.flaticon.com/free-icon/spaceship_897100?term=space&page=2&position=57
