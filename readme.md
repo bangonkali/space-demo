@@ -1,8 +1,22 @@
-## Build
+# Waning
 
-### Improvement in Build Time
+Is a small game environment I'm creating to study 3d graphics. 
 
-#### Development 
+Inspiration comes from Space based Fiction content/existing games such as [The Expanse](https://en.wikipedia.org/wiki/The_Expanse_(TV_series)), [Elite Dangerous](https://en.wikipedia.org/wiki/Elite_Dangerous), [Star Citizen](https://en.wikipedia.org/wiki/Star_Citizen), or [Home World](https://en.wikipedia.org/wiki/Homeworld), etc... 
+
+The plan is initially just to study the basics. Then maybe move into creating some sort of gameplay pattern. But at this point it's all research and trying things out. 
+
+For now at least, this is just for fun learning experience. If you find I'm doing anything crazy or I'm shooting myself in the foot, don't hesitate to post issues on Github. I'm always open to ideas as I go along with this study. ✌
+
+## Environments
+
+There are a couple of environments that this repo deploys to.
+
+### Development 
+
+Initially there was only the `production` environment, but it was very difficult to build locally so I had to do something about it an I setup a `development` environment which was **easy** and **fast** to build locally.
+
+[Dev Deployment](https://dev.waning.app/index.html) uses main thread for everything.
 
 ```
 time npx webpack --config webpack.config.dev.js
@@ -11,7 +25,9 @@ user    0m0.015s
 sys     0m0.169s
 ```
 
-#### Production 
+### Production 
+
+[Production Deployment](https://waning.app/index.html) tries to distribute effort to worker threads. For now, only 1 worker thread.
 
 ```
 time npx webpack --config webpack.config.prod.js
@@ -34,8 +50,8 @@ npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-materials@p
 
 ### Network Code
 
-- Nengi - a nice game server. 👍
-  - https://timetocode.com/nengi/authoritative-server
+- [Nakama](https://heroiclabs.com/) - a nice `golang` server.
+- [Nengi](https://timetocode.com/nengi/authoritative-server) - a nice game server.
 
 ### Worker Threads Babylon
 
