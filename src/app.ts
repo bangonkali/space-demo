@@ -4,13 +4,10 @@ import {
   HemisphericLight,
   Vector3,
   ActionManager,
-  SceneLoader,
-  AbstractMesh,
   Scalar,
   Color3,
   Color4,
   Quaternion,
-  SceneLoaderProgressEvent,
   CubeTexture,
 } from 'babylonjs';
 import { MoveableMesh } from './Models/Ships/MoveableMesh';
@@ -25,6 +22,7 @@ import _ from 'lodash';
 import { IPostable } from './Models/IPostable';
 import { DomUtils } from './Utils/DomUtils';
 import { MeshUtils } from './Utils/MeshUtils';
+import { VectorUtils } from './Utils/VectorUtils';
 
 /**
  * Vector3(Left/Right, Up/Down, Forward/Backward);
@@ -49,44 +47,6 @@ export class App implements IPostable {
 
     this.context.scene.clearColor = Color4.FromColor3(Color3.BlackReadOnly);
     this.context.scene.actionManager = new ActionManager(this.context.scene);
-  }
-
-  private async loadModel(
-    names: string[],
-    file: string
-  ): Promise<AbstractMesh[]> {
-    return new Promise((resolve, error) => {
-      if (!this.context) {
-        error(Error(`The context is null.`));
-        return;
-      }
-      const basePath = `${this.context.basePath}/assets/models`;
-      const cleanPath = `${DomUtils.cleanUrl(basePath)}/`;
-      console.log(`Downloading ${cleanPath}/${file}`);
-      SceneLoader.ImportMesh(
-        names,
-        cleanPath,
-        file,
-        this.context.scene,
-        (c: AbstractMesh[]) => {
-          names.forEach((e) => {
-            console.log(`Loaded '${cleanPath}${file}:${e}'. Components:`);
-          });
-          const log = c.map((mesh) => {
-            return MeshUtils.getMeshDescriptor(mesh);
-          });
-          // console.log(`Part: ${JSON.stringify(log, undefined, 2)}`);
-          resolve(c);
-        },
-        (e: SceneLoaderProgressEvent) => {
-          console.log(`Loading progress ${e.loaded}\\${e.total}`);
-        },
-        (message, exception) => {
-          console.error(`Error ${message}`);
-          error(exception);
-        }
-      );
-    });
   }
 
   private async loadSkybox(file: string): Promise<CubeTexture> {
@@ -126,16 +86,13 @@ export class App implements IPostable {
 
     const meshFile = `ship004.babylon`;
     const stuff = ['Ship004'];
-    const mesh = await this.loadModel(stuff, meshFile);
+    const mesh = await MeshUtils.loadModel(stuff, meshFile, this.context);
     mesh[0].position = Vector3.Zero().addInPlaceFromFloats(0, 1, 0);
-    mesh[0].renderingGroupId = 1;
 
-    // const meshFile2 = `TrumanClassVC.babylon`;
-    // const stuff2 = ['Truman DRN ROOT'];
-    // const mesh2 = await this.loadModel(stuff2, meshFile2);
-    // mesh2[0].position = new Vector3(0, 0, 100);
+    // const log = MeshUtils.getMeshDescriptor(mesh2[0]);
+    // console.log(`Part: ${JSON.stringify(log, undefined, 2)}`);
 
-    // console.log(`Loaded all assets`);
+    console.log(`Loaded all assets`);
 
     const actor = new MoveableMesh(
       mesh[0],
@@ -150,12 +107,20 @@ export class App implements IPostable {
 
     const light1 = new HemisphericLight(
       'light1',
-      new Vector3(0, 1000, 0),
+      VectorUtils.GetRandomUnit(),
       this.context.scene
     );
-    light1.intensity = 1;
 
-    AsteroidSystem.create(this.context);
+    const light2 = new HemisphericLight(
+      'light2',
+      VectorUtils.GetRandomUnit(),
+      this.context.scene
+    );
+
+    light1.intensity = 0.5;
+    light2.intensity = 0.5;
+
+    await AsteroidSystem.create(this.context);
     this.game = new Game(this.context, actor);
   }
 

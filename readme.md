@@ -120,3 +120,11 @@ npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-materials@p
 ## Icons
 
 - https://www.flaticon.com/free-icon/spaceship_897100?term=space&page=2&position=57
+
+## 3d Models for Testing
+
+This is temporary at least for now that I'm still not adept at modelling 3d. 
+
+### Asteroids
+
+- https://www.turbosquid.com/FullPreview/Index.cfm/ID/1415266

@@ -1,49 +1,70 @@
-import { MeshBuilder, Scalar, Vector3 } from 'babylonjs';
+import {
+  MeshBuilder,
+  Scalar,
+  Vector3,
+  Mesh,
+  Quaternion,
+  Space,
+} from 'babylonjs';
 import { IContext } from '../IContext';
+import { MeshUtils } from '../../Utils/MeshUtils';
+import { QuaternionUtils } from '../../Utils/QuaternionUtils';
+import { VectorUtils } from '../../Utils/VectorUtils';
+import { ScalarUtils } from '../../Utils/ScalarUtils';
 
 export class AsteroidSystem {
-  public static create(context: IContext): void {
+  public static async create(context: IContext): Promise<void> {
     if (!context) throw Error(`The context is null.`);
 
-    const fieldSize = 999;
-    const starSystem = MeshBuilder.CreateSphere(
-      'AsteroidSystem',
-      {
-        diameter: 1,
-        updatable: false,
-      },
-      context.scene
+    // The furthest distance of an asteroid
+    const fieldDiamater = 9999;
+
+    // Total number of instances in the asteroid field
+    const fieldSize = 2000;
+    const asteroidMeshFile = `Asteroid_Small_6X.babylon`;
+    const asteroidNodes = [
+      'Aster_Small_1_',
+      'Aster_Small_2_',
+      'Aster_Small_3_',
+      'Aster_Small_4_',
+      'Aster_Small_5_',
+      'Aster_Small_6_',
+    ];
+    const asteroidMeshes = await MeshUtils.loadModel(
+      asteroidNodes,
+      asteroidMeshFile,
+      context
     );
-    starSystem.isVisible = false;
+    asteroidMeshes.forEach((asteroidMesh) => {
+      asteroidMesh.position = new Vector3(0, 0, 10);
+      asteroidMesh.isVisible = false;
+    });
 
-    const rootSphere = MeshBuilder.CreateSphere(
-      `AsteroidRoot`,
-      {
-        diameter: 1,
-        updatable: false,
-      },
-      context.scene
-    );
-    rootSphere.isVisible = false;
+    const copies = Math.ceil(fieldSize / asteroidMeshes.length);
 
-    for (let i = 0; i < fieldSize; i++) {
-      const name = `${i.toString().padStart(4, '0')}`;
-      // const position = new Vector3(0, 0, 50);
-      const fieldDiamater = 6000;
-      const position = new Vector3(
-        Scalar.Denormalize(Math.random(), -fieldDiamater, fieldDiamater),
-        Scalar.Denormalize(Math.random(), -fieldDiamater, fieldDiamater),
-        Scalar.Denormalize(Math.random(), -fieldDiamater, fieldDiamater)
-      );
+    for (let j = 0; j < asteroidMeshes.length; j++) {
+      const rootInstance = asteroidMeshes[j] as Mesh;
 
-      const sphereSize = Scalar.Denormalize(Math.random(), 10, 200);
-      const sphere = rootSphere.createInstance(`Asteroid_${name}`);
-      sphere.parent = starSystem;
-      sphere.position = position;
-      sphere.isVisible = true;
-      sphere.scaling = new Vector3(sphereSize, sphereSize, sphereSize);
+      for (let i = 0; i < copies; i++) {
+        const name = `${j}_${i.toString().padStart(4, '0')}`;
+        const position = VectorUtils.GetRandom(1000, fieldDiamater);
+
+        const scaleFactor = Scalar.Denormalize(Math.random(), 1, 150);
+        const meshInstance = rootInstance.createInstance(`AST_${name}`);
+        meshInstance.position = position;
+        meshInstance.isVisible = true;
+        meshInstance.scaling = new Vector3(
+          scaleFactor,
+          scaleFactor,
+          scaleFactor
+        );
+        meshInstance.rotate(
+          VectorUtils.GetRandom(0, 1),
+          Math.random() * ScalarUtils.RadRev,
+          Space.LOCAL
+        );
+      }
     }
-
     console.log(`Finished creating ${fieldSize} asteroids.`);
   }
 }

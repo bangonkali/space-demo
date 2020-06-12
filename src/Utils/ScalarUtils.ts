@@ -16,6 +16,10 @@ export class ScalarUtils {
     );
   }
 
+  public static GetRandomSign(): number {
+    return Math.floor(Math.random() * 2) === 1 ? 1 : -1;
+  }
+
   public static Deteriorate(
     input: number,
     floor: number,
