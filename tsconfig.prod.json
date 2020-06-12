@@ -22,8 +22,18 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "experimentalDecorators": true,
-    "isolatedModules": false
+    "jsx": "react",
+    "isolatedModules": false,
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "classnameTransform": "dashes",
+          "customMatcher": "\\.module\\.css$"
+        }
+      }
+    ]
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "declaration.d.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

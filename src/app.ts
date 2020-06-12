@@ -19,12 +19,16 @@ import { Game } from './Models/Game/Game';
 import { IInputEvent } from './Models/Events/IInputEvent';
 import { IWorkerMessage } from './Models/Events/IWorkMessage';
 import { DocumentEventType } from './Models/Events/DocumentEventType';
-import { StarSystem } from './Models/StarSystem/StarSystem';
+import { AsteroidSystem } from './Models/SpaceSystem/AsteroidSystem';
 import { IResizeEvent } from './Models/Events/IResizeEvent';
 import _ from 'lodash';
 import { IPostable } from './Models/IPostable';
 import { DomUtils } from './Utils/DomUtils';
+import { MeshUtils } from './Utils/MeshUtils';
 
+/**
+ * Vector3(Left/Right, Up/Down, Forward/Backward);
+ */
 export class App implements IPostable {
   public static AppInstance: App = new App();
   public static IsWorkerStarted = false;
@@ -58,14 +62,20 @@ export class App implements IPostable {
       }
       const basePath = `${this.context.basePath}/assets/models`;
       const cleanPath = `${DomUtils.cleanUrl(basePath)}/`;
-      console.log(`Downloading ${cleanPath}`);
+      console.log(`Downloading ${cleanPath}/${file}`);
       SceneLoader.ImportMesh(
         names,
         cleanPath,
         file,
         this.context.scene,
         (c: AbstractMesh[]) => {
-          names.forEach((e) => console.log(`Loaded ${cleanPath}${e}`));
+          names.forEach((e) => {
+            console.log(`Loaded '${cleanPath}${file}:${e}'. Components:`);
+          });
+          const log = c.map((mesh) => {
+            return MeshUtils.getMeshDescriptor(mesh);
+          });
+          // console.log(`Part: ${JSON.stringify(log, undefined, 2)}`);
           resolve(c);
         },
         (e: SceneLoaderProgressEvent) => {
@@ -91,7 +101,7 @@ export class App implements IPostable {
         true,
         undefined,
         () => {
-          console.info(`Loaded ${texturePath}`);
+          console.info(`Loaded '${texturePath}'`);
           resolve(envTexture);
         },
         (message, exception) => {
@@ -120,6 +130,13 @@ export class App implements IPostable {
     mesh[0].position = Vector3.Zero().addInPlaceFromFloats(0, 1, 0);
     mesh[0].renderingGroupId = 1;
 
+    // const meshFile2 = `TrumanClassVC.babylon`;
+    // const stuff2 = ['Truman DRN ROOT'];
+    // const mesh2 = await this.loadModel(stuff2, meshFile2);
+    // mesh2[0].position = new Vector3(0, 0, 100);
+
+    // console.log(`Loaded all assets`);
+
     const actor = new MoveableMesh(
       mesh[0],
       this.context.basePath,
@@ -138,7 +155,7 @@ export class App implements IPostable {
     );
     light1.intensity = 1;
 
-    StarSystem.create(this.context);
+    AsteroidSystem.create(this.context);
     this.game = new Game(this.context, actor);
   }
 

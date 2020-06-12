@@ -11,8 +11,13 @@ import { IPostable } from './Models/IPostable';
 export class Bootstrap {
   private basePath = DomUtils.cleanUrl(document.location.origin);
   private workerPath = DomUtils.cleanUrl(`${this.basePath}/worker.bundle.js`);
+  private canvas: HTMLCanvasElement;
 
-  private bindInputs(canvas: HTMLCanvasElement, client: IPostable) {
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+  }
+
+  private bindInputs(client: IPostable) {
     console.log(`Binding input channel to canvas ${this.basePath}`);
 
     window.addEventListener('keydown', (e) => {
@@ -35,8 +40,8 @@ export class Bootstrap {
       client.postMessage(data);
     });
 
-    canvas.addEventListener('pointermove', (ev: MouseEvent) => {
-      const canvasRect = canvas.getBoundingClientRect();
+    this.canvas.addEventListener('pointermove', (ev: MouseEvent) => {
+      const canvasRect = this.canvas.getBoundingClientRect();
       const position = DomUtils.getMousePosition(ev, canvasRect);
       const mousePosition = new Vector2(position.x, position.y);
       const data: IInputEvent = {
@@ -46,7 +51,7 @@ export class Bootstrap {
       client.postMessage(data);
     });
 
-    canvas.addEventListener('pointerleave', (ev: MouseEvent) => {
+    this.canvas.addEventListener('pointerleave', (ev: MouseEvent) => {
       const data: IInputEvent = {
         type: DocumentEventType.Input,
         mouseClicked: false,
@@ -55,7 +60,7 @@ export class Bootstrap {
     });
 
     document.addEventListener('pointerup', (ev: MouseEvent) => {
-      const canvasRect = canvas.getBoundingClientRect();
+      const canvasRect = this.canvas.getBoundingClientRect();
       const position = DomUtils.getMousePosition(ev, canvasRect);
       const mousePosition = new Vector2(position.x, position.y);
       const data: IInputEvent = {
@@ -67,7 +72,7 @@ export class Bootstrap {
     });
 
     document.addEventListener('pointerdown', (ev: MouseEvent) => {
-      const canvasRect = canvas.getBoundingClientRect();
+      const canvasRect = this.canvas.getBoundingClientRect();
       const position = DomUtils.getMousePosition(ev, canvasRect);
       const mousePosition = new Vector2(position.x, position.y);
       const data: IInputEvent = {
@@ -81,50 +86,58 @@ export class Bootstrap {
     window.addEventListener('resize', () => {
       const resizeEvent: IResizeEvent = {
         type: DocumentEventType.Resize,
-        width: canvas.clientWidth,
-        height: canvas.clientHeight,
+        width: this.canvas.clientWidth,
+        height: this.canvas.clientHeight,
       };
       client.postMessage(resizeEvent);
     });
   }
 
-  public init(canvas: HTMLCanvasElement) {
-    if (!canvas) return;
+  private runOnMainThread() {
+    App.AppInstance.run(this.canvas, this.basePath);
+    this.bindInputs(App.AppInstance);
+  }
 
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+  public init() {
+    if (!this.canvas) return;
 
-    fetch(this.workerPath)
-      .then((workerResponse: Response) => {
-        if (
-          workerResponse.ok &&
-          'OffscreenCanvas' in window &&
-          'transferControlToOffscreen' in canvas
-        ) {
-          console.info(`Worker found. Trying web worker.`);
-          const offScreenCanvas = canvas.transferControlToOffscreen();
-          const worker = new Worker(this.workerPath);
-          const message: IWorkerMessage = {
-            type: DocumentEventType.Init,
-            canvas: offScreenCanvas,
-            basePath: this.basePath,
-          };
-          worker.postMessage(message, [offScreenCanvas]);
-          this.bindInputs(canvas, worker);
-        } else {
-          console.warn(`Worker not found. Using main thread.`);
-          App.AppInstance.run(canvas, this.basePath);
-          this.bindInputs(canvas, App.AppInstance);
-        }
-      })
-      .catch((err) => {
-        console.warn(`Worker not found, using main thread. ${err.message}`);
-        App.AppInstance.run(canvas, this.basePath);
-        this.bindInputs(canvas, App.AppInstance);
-      });
+    this.canvas.width = this.canvas.clientWidth;
+    this.canvas.height = this.canvas.clientHeight;
+
+    if (
+      __USE_WORKERS__ &&
+      'OffscreenCanvas' in window &&
+      'transferControlToOffscreen' in this.canvas
+    ) {
+      fetch(this.workerPath)
+        .then((workerResponse: Response) => {
+          if (workerResponse.ok) {
+            console.info(`Worker found. Trying web worker.`);
+            const offScreenCanvas = this.canvas.transferControlToOffscreen();
+            const worker = new Worker(this.workerPath);
+            const message: IWorkerMessage = {
+              type: DocumentEventType.Init,
+              canvas: offScreenCanvas,
+              basePath: this.basePath,
+            };
+            worker.postMessage(message, [offScreenCanvas]);
+            this.bindInputs(worker);
+          } else {
+            console.warn(`Worker not found. Using main thread.`);
+            this.runOnMainThread();
+          }
+        })
+        .catch((err) => {
+          console.warn(`Worker not found, using main thread. ${err.message}`);
+          this.runOnMainThread();
+        });
+    } else {
+      console.warn(`Worker Disabled or not supported, using main thread.`);
+      this.runOnMainThread();
+    }
   }
 }
 
-const canvas = document.getElementById('renderCanvas') as HTMLCanvasElement;
-const bootstrap = new Bootstrap();
-bootstrap.init(canvas);
+const c = document.getElementById('renderCanvas') as HTMLCanvasElement;
+const bootstrap = new Bootstrap(c);
+bootstrap.init();

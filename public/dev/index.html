@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
     <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
@@ -51,31 +51,7 @@
 
   <body>
     <canvas id="renderCanvas" touch-action="none"></canvas>
-    <div class="flex-container noselect top-header">
-      <p>
-        Test Overlay Text
-      </p>
-      <button onclick="console.log('Top_Button_1')">
-        Top_Button_1
-      </button>
-      <button onclick="console.log('Top_Button_2')">
-        Top_Button_2
-      </button>
-      <button onclick="console.log('Top_Button_3')">
-        Top_Button_3
-      </button>
-    </div>
-    <div class="flex-container noselect bottom-footer">
-      <button onclick="console.log('Bottom_Button_1')">
-        Bottom_Button_1
-      </button>
-      <button onclick="console.log('Bottom_Button_2')">
-        Bottom_Button_2
-      </button>
-      <button onclick="console.log('Bottom_Button_3')">
-        Bottom_Button_3
-      </button>
-    </div>
+    <div id="react"></div>
     <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
     <script src="assets/js/babylon.js"></script>
     <script src="assets/js/inspector/babylon.inspector.bundle.js"></script>
@@ -85,6 +61,9 @@
     <script src="assets/js/gui/babylon.gui.min.js"></script>
     <script src="assets/js/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
     <script src="assets/js/serializers/babylonjs.serializers.min.js"></script>
+    <script src="assets/js/react.development.js"></script>
+    <script src="assets/js/react-dom.development.js"></script>
     <script src="bootstrap.bundle.js"></script>
+    <script src="index.bundle.js"></script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 const path = require('path');
 const merge = require('webpack-merge');
+const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -17,6 +18,7 @@ module.exports = merge(common, {
   entry: {
     bootstrap: path.resolve(__dirname, 'src/bootstrap.ts'),
     worker: path.resolve(__dirname, 'src/worker.ts'),
+    index: path.resolve(__dirname, 'src/index.tsx'),
   },
   optimization: {
     minimize: true,
@@ -39,11 +41,20 @@ module.exports = merge(common, {
         },
       ],
     }),
+    new webpack.DefinePlugin({
+      __USE_WORKERS__: true,
+    }),
   ],
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        enforce: 'pre',
+        test: /\.js$/,
+        loader: 'source-map-loader',
+      },
+      {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: 'ts-loader',
@@ -52,7 +63,6 @@ module.exports = merge(common, {
             },
           },
         ],
-        exclude: /node_modules/,
       },
     ],
   },

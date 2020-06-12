@@ -1,18 +1,28 @@
 # Waning
 
-Is a small game environment I'm creating to study 3d graphics. 
+Is a small game environment I'm creating to study 3d graphics.
 
-Inspiration comes from Space based Fiction content/existing games such as [The Expanse](https://en.wikipedia.org/wiki/The_Expanse_(TV_series)), [Elite Dangerous](https://en.wikipedia.org/wiki/Elite_Dangerous), [Star Citizen](https://en.wikipedia.org/wiki/Star_Citizen), or [Home World](https://en.wikipedia.org/wiki/Homeworld), etc... 
+Inspiration comes from Space based Fiction content/existing games such as [The Expanse](<https://en.wikipedia.org/wiki/The_Expanse_(TV_series)>), [Elite Dangerous](https://en.wikipedia.org/wiki/Elite_Dangerous), [Star Citizen](https://en.wikipedia.org/wiki/Star_Citizen), or [Home World](https://en.wikipedia.org/wiki/Homeworld), etc...
 
-The plan is initially just to study the basics. Then maybe move into creating some sort of gameplay pattern. But at this point it's all research and trying things out. 
+The plan is initially just to study the basics. Then maybe move into creating some sort of gameplay pattern. But at this point it's all research and trying things out.
 
 For now at least, this is just for fun learning experience. If you find I'm doing anything crazy or I'm shooting myself in the foot, don't hesitate to post issues on Github. I'm always open to ideas as I go along with this study. ✌
+
+## React UI Components
+
+Since an [issue](https://forum.babylonjs.com/t/why-does-babylonjs-gui-need-something-from-document/11235?u=bangonkali) was encountered with using Babylon-UI for rendering User Interface components from a background thread, I have in the interim decided to use react as the overlay mechanism for the UI. The UI is rendered on top of the canvas.
+
+In order to have a good developer experience while working with React, installing Chrome Extension [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi/related?hl=en) might help.
+
+Also, there is a good amount of quick references here on React.
+- https://fettblog.eu/typescript-react/hooks/
+
 
 ## Environments
 
 There are a couple of environments that this repo deploys to.
 
-### Development 
+### Development
 
 Initially there was only the `production` environment, but it was very difficult to build locally so I had to do something about it an I setup a `development` environment which was **easy** and **fast** to build locally.
 
@@ -25,7 +35,7 @@ user    0m0.015s
 sys     0m0.169s
 ```
 
-### Production 
+### Production
 
 [Production Deployment](https://waning.app/index.html) tries to distribute effort to worker threads. For now, only 1 worker thread.
 
