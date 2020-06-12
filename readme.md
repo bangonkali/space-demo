@@ -2,11 +2,15 @@
 
 Is a small game environment I'm creating to study 3d graphics.
 
-Inspiration comes from Space based Fiction content/existing games such as [The Expanse](<https://en.wikipedia.org/wiki/The_Expanse_(TV_series)>), [Elite Dangerous](https://en.wikipedia.org/wiki/Elite_Dangerous), [Star Citizen](https://en.wikipedia.org/wiki/Star_Citizen), or [Home World](https://en.wikipedia.org/wiki/Homeworld), etc...
+Inspiration comes from Space based Fiction content/existing games such as [The Expanse](<https://en.wikipedia.org/wiki/The_Expanse_(TV_series)>), [Elite Dangerous](https://en.wikipedia.org/wiki/Elite_Dangerous), [Star Citizen](https://en.wikipedia.org/wiki/Star_Citizen), or [Home World](https://en.wikipedia.org/wiki/Homeworld), etc... Try it out at [waning.app](https://waning.app/)! 😂
+
+![Banner](docs/images/banner01.PNG)
 
 The plan is initially just to study the basics. Then maybe move into creating some sort of gameplay pattern. But at this point it's all research and trying things out.
 
 For now at least, this is just for fun learning experience. If you find I'm doing anything crazy or I'm shooting myself in the foot, don't hesitate to post issues on Github. I'm always open to ideas as I go along with this study. ✌
+
+You can follow my Youtube Vlog [here](https://www.youtube.com/playlist?list=PL6qNlq3smRV9qgHdKCYN-G0oKQSTr9ZGm) for updates on this study.
 
 ## React UI Components
 
@@ -124,6 +128,10 @@ npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-materials@p
 ## 3d Models for Testing
 
 This is temporary at least for now that I'm still not adept at modelling 3d. 
+
+### Ships
+
+- https://www.turbosquid.com/FullPreview/Index.cfm/ID/1216479
 
 ### Asteroids
 
