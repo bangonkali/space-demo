@@ -1,5 +1,9 @@
 # Waning
 
+This project is archived! It is no longer going to be deployed on any environment. I'm moving on to other things. 😂
+
+## About 
+
 Is a small game environment I'm creating to study 3d graphics.
 
 Inspiration comes from Space based Fiction content/existing games such as [The Expanse](<https://en.wikipedia.org/wiki/The_Expanse_(TV_series)>), [Elite Dangerous](https://en.wikipedia.org/wiki/Elite_Dangerous), [Star Citizen](https://en.wikipedia.org/wiki/Star_Citizen), or [Home World](https://en.wikipedia.org/wiki/Homeworld), etc... Try it out at [waning.app](https://waning.app/)! 😂

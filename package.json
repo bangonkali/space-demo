@@ -11,9 +11,6 @@
     "lint": "eslint \"src/**/*.ts\" --fix --quiet",
     "serve": "webpack --watch"
   },
-  "pre-commit": [
-    "lint"
-  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
